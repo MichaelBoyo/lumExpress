@@ -1,11 +1,15 @@
 package africa.semicolon.lumexpress.data.models;
 
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.MappedSuperclass;
+
 @Getter
 @Setter
+@MappedSuperclass
 public class LumExpressUser {
     private String firstName;
     private String lastName;
@@ -13,4 +17,5 @@ public class LumExpressUser {
     private String password;
     private String phoneNumber;
     private String imageUrl;
+    private boolean isEnabled;
 }

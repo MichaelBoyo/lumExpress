@@ -1,8 +1,7 @@
-package africa.semicolon.lumexpress.service;
+package africa.semicolon.lumexpress.service.productService;
 
 import africa.semicolon.lumexpress.data.dto.request.AddProductRequest;
 import africa.semicolon.lumexpress.data.dto.request.GetAllItemsRequest;
-import africa.semicolon.lumexpress.data.dto.request.UpdateProductRequest;
 import africa.semicolon.lumexpress.data.dto.response.AddProductResponse;
 import africa.semicolon.lumexpress.data.dto.response.UpdateProductResponse;
 import africa.semicolon.lumexpress.data.models.Category;
@@ -11,7 +10,6 @@ import africa.semicolon.lumexpress.data.repositories.ProductRepository;
 import africa.semicolon.lumexpress.exception.ProductNotFoundException;
 import africa.semicolon.lumexpress.service.cloud.CloudService;
 import com.cloudinary.utils.ObjectUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -25,18 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper mapper;
     private final CloudService cloudService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
 
     @Override
@@ -44,10 +40,9 @@ public class ProductServiceImpl implements ProductService{
         Product product = mapper.map(request, Product.class);
         product.getCategories().add(
                 Category.valueOf(request.getProductCategory().toUpperCase()));
-        var imageUrl =
+        String imageUrl =
                 cloudService.upload(request.getImage()
                         .getBytes(), ObjectUtils.emptyMap());
-        log.info("cloudinary image url::{}", imageUrl);
         product.setImageUrl(imageUrl);
         Product savedProduct = productRepository.save(product);
         return buildAddProductResponse(savedProduct);
@@ -62,35 +57,25 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch)  {
-        //find product
+    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) {
         var foundProduct =
                 productRepository.findById(productId)
-                        .orElseThrow(()-> new ProductNotFoundException(
-                                String.format("product with id %d not found",
-                                        productId)
-                        ));
+                        .orElseThrow(ProductNotFoundException::new);
+
         Product updatedProduct = applyPatchToProduct(patch, foundProduct);
-        //save updated product
-        var savedProduct=productRepository.save(updatedProduct);
+        assert updatedProduct != null;
+        var savedProduct = productRepository.save(updatedProduct);
         return buildUpdateResponse(savedProduct);
     }
 
-    private Product applyPatchToProduct(JsonPatch patch, Product foundProduct)  {
-        //convert found product to json node
+    private Product applyPatchToProduct(JsonPatch patch, Product foundProduct) {
         var productNode = objectMapper.convertValue(foundProduct, JsonNode.class);
-        //apply patch to productNode
-        JsonNode patchedProductNode;
         try {
-            patchedProductNode = patch.apply(productNode);
-            //convert patchedNode to product object
-            var updatedProduct =
-                    objectMapper.readValue(objectMapper.writeValueAsBytes(patchedProductNode),
-                            Product.class);
-            return updatedProduct;
-        } catch (IOException| JsonPatchException exception) {
-            exception.printStackTrace();
-            return null;
+           var patchedProductNode = patch.apply(productNode);
+            return objectMapper.readValue(objectMapper.writeValueAsBytes(patchedProductNode),
+                    Product.class);
+        } catch (IOException | JsonPatchException exception) {
+            throw new RuntimeException(exception.getMessage(), exception.getCause());
         }
     }
 
@@ -105,19 +90,15 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(
-                        ()->new ProductNotFoundException(
-                String.format("product with id %d not found", id)));
+        return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
     }
 
     @Override
     public Page<Product> getAllProducts(GetAllItemsRequest getAllItemsRequest) {
         Pageable pageSpecs = PageRequest
-                .of(getAllItemsRequest.getPageNumber()-1,
-                getAllItemsRequest.getNumberOfItemsPerPage());
-        Page<Product> products =
-                productRepository.findAll(pageSpecs);
-        return products;
+                .of(getAllItemsRequest.getPageNumber() - 1,
+                        getAllItemsRequest.getNumberOfItemsPerPage());
+        return productRepository.findAll(pageSpecs);
     }
 
     @Override

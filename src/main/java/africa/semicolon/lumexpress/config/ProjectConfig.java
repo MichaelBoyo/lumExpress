@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ProjectConfig {
-    @Value("${cloudinary.api.name}")
+    @Value("${cloudinary.cloud_name}")
     private  String cloudName;
-    @Value("${cloudinary.api.key}")
+    @Value("${cloudinary.api_key}")
     private String cloudKey;
-    @Value("${cloudinary.api.secret}")
+    @Value("${cloudinary.api_secret}")
     private String cloudSecret;
 
     @Bean

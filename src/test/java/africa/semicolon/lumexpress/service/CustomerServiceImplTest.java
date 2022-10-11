@@ -2,6 +2,7 @@ package africa.semicolon.lumexpress.service;
 
 import africa.semicolon.lumexpress.data.dto.request.CustomerRegistrationRequest;
 import africa.semicolon.lumexpress.data.dto.response.CustomerRegistrationResponse;
+import africa.semicolon.lumexpress.service.customerService.CustomerService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class CustomerServiceImplTest {
@@ -22,9 +22,11 @@ class CustomerServiceImplTest {
     void setUp() {
         request = CustomerRegistrationRequest
                 .builder()
-                .email("test@gmail.com")
+                .email("boyomichaelbidemi@gmail.com")
                 .password("test Password")
                 .country("Nigeria")
+                .firstName("Michael")
+                .lastName("Boyo")
                 .build();
     }
 

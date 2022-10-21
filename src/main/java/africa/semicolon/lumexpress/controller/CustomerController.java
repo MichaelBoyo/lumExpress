@@ -2,6 +2,8 @@ package africa.semicolon.lumexpress.controller;
 
 import africa.semicolon.lumexpress.data.dto.request.CustomerRegistrationRequest;
 import africa.semicolon.lumexpress.data.dto.request.GetAllCustomersRequest;
+import africa.semicolon.lumexpress.data.dto.request.UpdateCustomerDetails;
+import africa.semicolon.lumexpress.exception.UserNotFoundException;
 import africa.semicolon.lumexpress.service.customerService.CustomerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +20,7 @@ import javax.validation.Valid;
 public record CustomerController(CustomerService customerService) {
 
     @PostMapping
-    public ResponseEntity<?> registerUser(@Valid @RequestBody CustomerRegistrationRequest request){
-        log.info("body ---> {}",request);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody CustomerRegistrationRequest request) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.register(request));
     }
 
@@ -28,5 +29,9 @@ public record CustomerController(CustomerService customerService) {
         return ResponseEntity.ok(customerService.getAllCustomers(request));
     }
 
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateCustomer(@RequestBody UpdateCustomerDetails request) throws UserNotFoundException {
+        return ResponseEntity.ok(customerService.completeProfile(request));
+    }
 
 }

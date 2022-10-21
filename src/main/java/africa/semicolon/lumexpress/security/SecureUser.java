@@ -9,12 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @AllArgsConstructor
-public class SecureUser implements UserDetails {
-    private LumExpressUser user;
+public record SecureUser(LumExpressUser user) implements UserDetails {
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getAuthorities().stream().map(authority -> new SimpleGrantedAuthority(authority.name())).toList();
+        return user.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.name())).toList();
     }
 
     @Override
@@ -24,7 +25,7 @@ public class SecureUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getPassword();
+        return user.getEmail();
     }
 
     @Override
@@ -44,6 +45,6 @@ public class SecureUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getIsEnabled();
     }
 }

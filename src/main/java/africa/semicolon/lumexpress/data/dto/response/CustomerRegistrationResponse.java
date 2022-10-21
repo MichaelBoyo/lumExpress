@@ -9,7 +9,6 @@ import lombok.*;
 @Builder
 public class CustomerRegistrationResponse {
     private Long userId;
-    private Long addressId;
     private String message;
     private int code;
 }

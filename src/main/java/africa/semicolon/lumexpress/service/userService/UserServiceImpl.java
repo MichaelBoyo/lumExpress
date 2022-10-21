@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LumExpressUser getUserByEmail(String email) {
+    public LumExpressUser getUserByEmail(String email) throws UserNotFoundException {
         Optional<Admin> user = adminRepository.findByEmail(email);
         if (user.isPresent()) return user.get();
         Optional<Customer> customer = customerRepository.findByEmail(email);

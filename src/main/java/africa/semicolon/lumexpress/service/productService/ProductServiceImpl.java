@@ -9,7 +9,6 @@ import africa.semicolon.lumexpress.data.models.Product;
 import africa.semicolon.lumexpress.data.repositories.ProductRepository;
 import africa.semicolon.lumexpress.exception.ProductNotFoundException;
 import africa.semicolon.lumexpress.service.cloud.CloudService;
-import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
@@ -57,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) {
+    public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) throws ProductNotFoundException {
         Product foundProduct =
                 productRepository.findById(productId)
                         .orElseThrow(ProductNotFoundException::new);
@@ -82,14 +81,14 @@ public class ProductServiceImpl implements ProductService {
     private static UpdateProductResponse buildUpdateResponse(Product savedProduct) {
         return UpdateProductResponse.builder()
                 .productName(savedProduct.getName())
-                .price(savedProduct.getPrice().doubleValue())
+                .price(savedProduct.getPrice())
                 .message("update successful")
                 .statusCode(200)
                 .build();
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(Long id) throws ProductNotFoundException {
         return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
     }
 

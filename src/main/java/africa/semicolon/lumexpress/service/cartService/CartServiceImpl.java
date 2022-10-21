@@ -7,6 +7,7 @@ import africa.semicolon.lumexpress.data.models.Item;
 import africa.semicolon.lumexpress.data.models.Product;
 import africa.semicolon.lumexpress.data.repositories.CartRepository;
 import africa.semicolon.lumexpress.exception.CartNotFoundException;
+import africa.semicolon.lumexpress.exception.ProductNotFoundException;
 import africa.semicolon.lumexpress.service.productService.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public record CartServiceImpl(CartRepository cartRepository, ProductService productService) implements CartService {
 
     @Override
-    public CartResponse addProductToCart(CartRequest cartRequest) {
+    public CartResponse addProductToCart(CartRequest cartRequest) throws ProductNotFoundException, CartNotFoundException {
         Cart cart = cartRepository.findById(cartRequest.getCartId())
                 .orElseThrow(CartNotFoundException::new);
         Product product = productService.getProductById(cartRequest.getProductId());
@@ -40,7 +41,7 @@ public record CartServiceImpl(CartRepository cartRepository, ProductService prod
     }
 
     @Override
-    public Cart getCartById(long id) {
+    public Cart getCartById(long id) throws CartNotFoundException {
         return cartRepository.findById(id).orElseThrow(CartNotFoundException::new);
     }
 

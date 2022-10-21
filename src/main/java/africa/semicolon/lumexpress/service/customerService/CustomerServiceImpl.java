@@ -6,6 +6,7 @@ import africa.semicolon.lumexpress.data.dto.response.CustomerRegistrationRespons
 import africa.semicolon.lumexpress.data.dto.response.CustomerResponse;
 import africa.semicolon.lumexpress.data.dto.response.LoginResponse;
 import africa.semicolon.lumexpress.data.models.Address;
+import africa.semicolon.lumexpress.data.models.Authority;
 import africa.semicolon.lumexpress.data.models.Cart;
 import africa.semicolon.lumexpress.data.models.Customer;
 import africa.semicolon.lumexpress.data.repositories.CustomerRepository;
@@ -18,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -30,12 +32,19 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final EmailNotificationService emailNotificationService;
     private final VerificationTokenService verificationTokenService;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
     @Override
-    public CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest) {
+    public CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest) throws UserNotFoundException {
+        if(customerRepository.existsByEmail(registerRequest.getEmail())){
+            throw new UserNotFoundException("User with email " + registerRequest.getEmail() + " already exists");
+        }
+        registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         Customer customer = mapper.map(registerRequest, Customer.class);
+        customer.setIsEnabled(true);
         customer.setCart(new Cart());
+        customer.getAuthorities().add(Authority.BUY);
         setCustomerAddress(registerRequest, customer);
         Customer savedCustomer = customerRepository.save(customer);
 //        sendEmail(customer);
@@ -68,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRegistrationResponse registrationResponseBuilder(
             Customer customer) {
         return CustomerRegistrationResponse.builder()
-                .addressId(0L)
+
                 .message("success")
                 .userId(customer.getId())
                 .code(201)
@@ -81,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CompleteProfileResponse completeProfile(UpdateCustomerDetails updateCustomerDetails) {
+    public CompleteProfileResponse completeProfile(UpdateCustomerDetails updateCustomerDetails) throws UserNotFoundException {
         Customer customer = customerRepository.findById(updateCustomerDetails.getCustomerId())
                 .orElseThrow(UserNotFoundException::new);
         mapper.map(updateCustomerDetails, customer);

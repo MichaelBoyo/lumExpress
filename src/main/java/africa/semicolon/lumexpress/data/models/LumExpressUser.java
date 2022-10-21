@@ -22,7 +22,7 @@ public class LumExpressUser {
     private String password;
     private String phoneNumber;
     private String imageUrl;
-    private boolean isEnabled;
+    private Boolean isEnabled;
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

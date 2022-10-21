@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public record CustomUserDetailsServiceImpl(UserService userService) implements UserDetailsService {
+public record CustomUserDetailsService(UserService userService) implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {

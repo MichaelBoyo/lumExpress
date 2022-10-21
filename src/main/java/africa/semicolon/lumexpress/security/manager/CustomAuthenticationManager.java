@@ -13,6 +13,6 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private final CustomAuthenticationProvider customAuthenticationProvider;
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        return null;
+        return customAuthenticationProvider.authenticate(authentication);
     }
 }

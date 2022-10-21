@@ -13,15 +13,15 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
+@ToString(callSuper = true)
 public class Customer extends LumExpressUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne
     @Cascade(org.hibernate.annotations.CascadeType.PERSIST)
     private Cart cart;
     @OneToMany(fetch = FetchType.EAGER)
-    @Cascade(org.hibernate.annotations.CascadeType.PERSIST)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Set<Address> addresses = new HashSet<>();
 }

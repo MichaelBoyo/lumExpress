@@ -40,10 +40,10 @@ public class ProductServiceImpl implements ProductService {
         Product product = mapper.map(request, Product.class);
         product.getCategories().add(
                 Category.valueOf(request.getProductCategory().toUpperCase()));
-        String imageUrl =
-                cloudService.upload(request.getImage()
-                        .getBytes(), ObjectUtils.emptyMap());
-        product.setImageUrl(imageUrl);
+//        String imageUrl =
+//                cloudService.upload(request.getImage()
+//                        .getBytes(), ObjectUtils.emptyMap());
+//        product.setImageUrl(imageUrl);
         Product savedProduct = productRepository.save(product);
         return buildAddProductResponse(savedProduct);
     }
@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public UpdateProductResponse updateProductDetails(Long productId, JsonPatch patch) {
-        var foundProduct =
+        Product foundProduct =
                 productRepository.findById(productId)
                         .orElseThrow(ProductNotFoundException::new);
 
@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     private static UpdateProductResponse buildUpdateResponse(Product savedProduct) {
         return UpdateProductResponse.builder()
                 .productName(savedProduct.getName())
-                .price(savedProduct.getPrice())
+                .price(savedProduct.getPrice().doubleValue())
                 .message("update successful")
                 .statusCode(200)
                 .build();
@@ -105,4 +105,6 @@ public class ProductServiceImpl implements ProductService {
     public String deleteProduct(Long id) {
         return null;
     }
+
+
 }

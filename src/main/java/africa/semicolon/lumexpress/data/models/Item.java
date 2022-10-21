@@ -10,10 +10,12 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Builder
+@ToString
 public class Item {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Product product;
+    private Integer quantity;
 }

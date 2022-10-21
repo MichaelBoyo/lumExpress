@@ -9,4 +9,5 @@ public class LumExpressUtils {
         int token = 10000 + random.nextInt(89000) ;
         return String.valueOf(token);
     }
+
 }

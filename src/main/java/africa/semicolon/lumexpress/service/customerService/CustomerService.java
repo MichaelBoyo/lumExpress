@@ -4,6 +4,7 @@ import africa.semicolon.lumexpress.data.dto.request.CustomerRegistrationRequest;
 import africa.semicolon.lumexpress.data.dto.request.GetAllCustomersRequest;
 import africa.semicolon.lumexpress.data.dto.request.LoginRequest;
 import africa.semicolon.lumexpress.data.dto.request.UpdateCustomerDetails;
+import africa.semicolon.lumexpress.data.dto.response.CompleteProfileResponse;
 import africa.semicolon.lumexpress.data.dto.response.CustomerRegistrationResponse;
 import africa.semicolon.lumexpress.data.dto.response.CustomerResponse;
 import africa.semicolon.lumexpress.data.dto.response.LoginResponse;
@@ -14,7 +15,9 @@ import java.util.List;
 public interface CustomerService {
     CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest);
     LoginResponse login(LoginRequest loginRequest);
-    String completeProfile(UpdateCustomerDetails updateCustomerDetails);
+    CompleteProfileResponse completeProfile(UpdateCustomerDetails updateCustomerDetails);
 
     Page<CustomerResponse> getAllCustomers(GetAllCustomersRequest request);
+
+    void deleteAll();
 }

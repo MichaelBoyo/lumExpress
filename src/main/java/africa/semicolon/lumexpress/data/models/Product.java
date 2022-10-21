@@ -17,10 +17,10 @@ import java.util.List;
 @ToString
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private double price;
+    private BigDecimal price;
     private int quantity;
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Category> categories =new ArrayList<>();

@@ -1,6 +1,7 @@
 package africa.semicolon.lumexpress.service.customerService;
 
 import africa.semicolon.lumexpress.data.dto.request.*;
+import africa.semicolon.lumexpress.data.dto.response.CompleteProfileResponse;
 import africa.semicolon.lumexpress.data.dto.response.CustomerRegistrationResponse;
 import africa.semicolon.lumexpress.data.dto.response.CustomerResponse;
 import africa.semicolon.lumexpress.data.dto.response.LoginResponse;
@@ -8,6 +9,7 @@ import africa.semicolon.lumexpress.data.models.Address;
 import africa.semicolon.lumexpress.data.models.Cart;
 import africa.semicolon.lumexpress.data.models.Customer;
 import africa.semicolon.lumexpress.data.repositories.CustomerRepository;
+import africa.semicolon.lumexpress.exception.UserNotFoundException;
 import africa.semicolon.lumexpress.service.notification.EmailNotificationService;
 import africa.semicolon.lumexpress.service.verificationTokenService.VerificationTokenService;
 import lombok.AllArgsConstructor;
@@ -36,7 +38,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setCart(new Cart());
         setCustomerAddress(registerRequest, customer);
         Customer savedCustomer = customerRepository.save(customer);
-        sendEmail(customer);
+//        sendEmail(customer);
         return registrationResponseBuilder(savedCustomer);
     }
 
@@ -48,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
         ) {
             message = String.format(bufferedReader.lines().collect(Collectors.joining()),
                     customer.getFirstName() + " " + customer.getLastName(),
-                    "https://luminary-express.herokuapp.com/login" + token.getToken());
+                    "http://localhost:8080/api/v1/customer/verify/" + token.getToken());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,6 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRegistrationResponse registrationResponseBuilder(
             Customer customer) {
         return CustomerRegistrationResponse.builder()
+                .addressId(0L)
                 .message("success")
                 .userId(customer.getId())
                 .code(201)
@@ -78,8 +81,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String completeProfile(UpdateCustomerDetails updateCustomerDetails) {
-        return null;
+    public CompleteProfileResponse completeProfile(UpdateCustomerDetails updateCustomerDetails) {
+        Customer customer = customerRepository.findById(updateCustomerDetails.getCustomerId())
+                .orElseThrow(UserNotFoundException::new);
+        mapper.map(updateCustomerDetails, customer);
+        customer.getAddresses().stream().findFirst().ifPresent(address -> mapper.map(updateCustomerDetails,address));
+        customerRepository.save(customer);
+        return new CompleteProfileResponse("customer updated successfully");
     }
 
     @Override
@@ -87,5 +95,10 @@ public class CustomerServiceImpl implements CustomerService {
         Pageable pageable = PageRequest.of(
                 request.getPageNumber() - 1, request.getNumberOfCustomersPerPage());
         return customerRepository.findAll(pageable).map(customer -> mapper.map(customer, CustomerResponse.class));
+    }
+
+    @Override
+    public void deleteAll() {
+        customerRepository.deleteAll();
     }
 }

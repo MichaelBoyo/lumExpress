@@ -41,14 +41,14 @@ class ProductServiceImplTest {
     private AddProductResponse response;
     @BeforeEach
     void setUp() throws IOException {
-        Path path = Paths
-                .get("/home/semicolon/Pictures/peak.jpg");
-
-        MultipartFile file =
-                new MockMultipartFile("peak",
-                        Files.readAllBytes(path));
-        request = buildAddProductRequest(file);
-//        response = productService.addProduct(request);
+//        Path path = Paths
+//                .get("/home/semicolon/Pictures/peak.jpg");
+//
+//        MultipartFile file =
+//                new MockMultipartFile("peak",
+//                        Files.readAllBytes(path));
+        request = buildAddProductRequest();
+        response = productService.addProduct(request);
     }
 
 
@@ -104,7 +104,7 @@ class ProductServiceImplTest {
 
     @Test
     void deleteProductTest() {
-        assertThat(productService.deleteProduct(response.getProductId()));
+        assertThat(productService.deleteProduct(response.getProductId())).isNotNull();
 
     }
 
@@ -116,13 +116,13 @@ class ProductServiceImplTest {
                 .build();
     }
 
-    private AddProductRequest buildAddProductRequest(MultipartFile file) {
+    private AddProductRequest buildAddProductRequest() {
         return AddProductRequest.builder()
                 .name("Milk")
                 .productCategory("Beverages")
                 .price(BigDecimal.valueOf(30.00))
                 .quantity(10)
-                .image(file)
+
                 .build();
     }
 
